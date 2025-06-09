@@ -42,7 +42,7 @@ def copy_files(from_path, to_path):
     else:
         raise Exception("The file paths provided are incorrect.")
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
 
     with open(from_path) as contents:
@@ -53,13 +53,15 @@ def generate_page(from_path, template_path, dest_path):
     with open(template_path) as contents:
         template_file = contents.read()
         final_file = template_file.replace("{{ Title }}", title).replace("{{ Content }}", html_string)
+        final_file = final_file.replace('href="/', f'href="{basepath}')
+        final_file = final_file.replace('src="/', f'src="{basepath}')
 
     os.makedirs(os.path.dirname(dest_path), exist_ok=True)
 
     with open(dest_path, "w") as f:
         f.write(final_file)
     
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
     content_root = Path(dir_path_content)
     dest_root = Path(dest_dir_path)
 
@@ -69,8 +71,8 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
         
             relative_path = entry.relative_to(content_root)
             dest_file = dest_root / relative_path.with_suffix(".html")
-            generate_page(entry, template_path, dest_file)
+            generate_page(entry, template_path, dest_file, basepath)
         
         elif entry.is_dir():
 
-            generate_pages_recursive(entry, template_path, dest_root / entry.name)
+            generate_pages_recursive(entry, template_path, dest_root / entry.name, basepath)

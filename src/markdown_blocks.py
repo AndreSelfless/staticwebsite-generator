@@ -5,7 +5,7 @@ def markdown_to_blocks(markdown):
     blocks = []
     current_block = []
 
-    for line in lines:
+    for line in lines: 
         if line.strip() == "":
             if current_block:
                 blocks.append("\n".join(current_block))
